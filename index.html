@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KVN_EXE Vault">
+<meta name="theme-color" content="#061019">
+<title>KVN_EXE Vault</title>
+<style>
+  :root {
+    --bg-deep: #061019;
+    --bg-surface: #0b1b2b;
+    --bg-card: #10253a;
+    --bg-elevated: #15314d;
+    --border-subtle: rgba(56, 189, 248, 0.16);
+    --border-active: rgba(16, 185, 129, 0.45);
+    --cyan: #0ea5e9;
+    --cyan-bright: #38bdf8;
+    --emerald: #10b981;
+    --emerald-bright: #00e699;
+    --danger: #ef4444;
+    --text-primary: #f0f9ff;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 15% 10%, rgba(14, 165, 233, 0.14), transparent 42%),
+      radial-gradient(circle at 85% 90%, rgba(16, 185, 129, 0.12), transparent 45%),
+      var(--bg-deep);
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  /* Privacy Curtain for iOS App Switcher */
+  #privacyCurtain {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(6, 16, 25, 0.96);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  /* Auth & Setup Screens */
+  .auth-screen {
+    min-height: 100dvh;
+    padding: calc(24px + var(--safe-top)) 20px calc(24px + var(--safe-bottom));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 390px;
+    background: rgba(11, 27, 43, 0.88);
+    border: 1px solid var(--border-subtle);
+    border-radius: 26px;
+    padding: 32px 24px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .shield-badge {
+    width: 68px;
+    height: 68px;
+    border-radius: 20px;
+    background: linear-gradient(145deg, rgba(14, 165, 233, 0.18), rgba(16, 185, 129, 0.18));
+    border: 1px solid rgba(0, 230, 153, 0.32);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.18);
+  }
+
+  .brand-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    background: linear-gradient(90deg, var(--cyan-bright), var(--emerald-bright));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+  }
+
+  .form-stack {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .input-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  .vault-input {
+    width: 100%;
+    height: 50px;
+    padding: 0 46px 0 16px;
+    border-radius: 14px;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 16px; /* Prevents iOS Safari zoom */
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .vault-input:focus {
+    border-color: var(--emerald);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  }
+
+  .eye-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .strength-track {
+    width: 100%;
+    height: 4px;
+    background: var(--bg-card);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .strength-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--cyan), var(--emerald-bright));
+    transition: width 0.25s ease;
+  }
+
+  .toggle-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(16, 37, 58, 0.65);
+    border: 1px solid var(--border-subtle);
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+
+  .switch {
+    position: relative;
+    width: 46px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: #1e3a5f;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .slider::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.2s;
+  }
+
+  .switch input:checked + .slider {
+    background: linear-gradient(90deg, var(--cyan), var(--emerald));
+  }
+
+  .switch input:checked + .slider::before {
+    transform: translateX(20px);
+  }
+
+  .btn-primary {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--cyan), var(--emerald));
+    color: #03131a;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform 0.12s, opacity 0.2s;
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-faceid {
+    width: 100%;
+    height: 52px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 230, 153, 0.45);
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.16), rgba(16, 185, 129, 0.22));
+    color: var(--emerald-bright);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform 0.12s, background 0.2s;
+  }
+
+  .btn-faceid:active {
+    transform: scale(0.98);
+  }
+
+  .error-pill {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(239, 68, 68, 0.14);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+
+  .shake {
+    animation: shake 0.35s ease;
+  }
+
+  /* Main Workspace */
+  #vaultApp {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .top-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    padding: calc(12px + var(--safe-top)) 18px 12px;
+    background: rgba(6, 16, 25, 0.84);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .top-row {
+    max-width: 980px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand-cluster {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-name {
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--cyan-bright), var(--emerald-bright));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .icon-btn.active {
+    border-color: var(--emerald);
+    color: var(--emerald-bright);
+    background: rgba(16, 185, 129, 0.14);
+  }
+
+  .icon-btn.lock-btn {
+    border-color: rgba(16, 185, 129, 0.35);
+    color: var(--emerald-bright);
+  }
+
+  .search-drawer {
+    max-width: 980px;
+    margin: 10px auto 0;
+  }
+
+  .sub-bar {
+    max-width: 980px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 14px 18px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .filter-pills {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .filter-pills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pill {
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .pill.active {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.22), rgba(16, 185, 129, 0.24));
+    border-color: var(--emerald);
+    color: var(--text-primary);
+  }
+
+  .view-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  /* Progress Strip */
+  #progressWrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 100;
+    background: rgba(14, 165, 233, 0.15);
+  }
+
+  #progressBar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--cyan-bright), var(--emerald-bright));
+    transition: width 0.2s ease;
+  }
+
+  /* Grid & List */
+  .vault-container {
+    max-width: 980px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 12px 18px calc(112px + var(--safe-bottom));
+    flex: 1;
+  }
+
+  .vault-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(156px, 1fr));
+    gap: 18px;
+  }
+
+  .vault-grid.list-mode {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .media-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .media-card:active {
+    transform: scale(0.98);
+    border-color: var(--emerald);
+  }
+
+  .vault-grid.list-mode .media-card {
+    flex-direction: row;
+    align-items: center;
+    height: 68px;
+    padding-right: 14px;
+  }
+
+  .thumb-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .vault-grid.list-mode .thumb-box {
+    width: 68px;
+    height: 68px;
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
+  }
+
+  .thumb-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: filter 0.2s;
+  }
+
+  .blurred .thumb-box img {
+    filter: blur(18px) brightness(0.75);
+    transform: scale(1.12);
+  }
+
+  .play-badge {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(6, 16, 25, 0.78);
+    border: 1px solid rgba(0, 230, 153, 0.5);
+    color: var(--emerald-bright);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .file-ext-badge {
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: rgba(14, 165, 233, 0.16);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: var(--cyan-bright);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .card-meta {
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .vault-grid.list-mode .card-meta {
+    flex: 1;
+    padding: 0 0 0 14px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-size {
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  /* Empty State */
+  .empty-state {
+    min-height: 52dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: var(--text-muted);
+  }
+
+  .empty-ring {
+    width: 72px;
+    height: 72px;
+    border-radius: 22px;
+    background: rgba(11, 27, 43, 0.85);
+    border: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cyan-bright);
+  }
+
+  /* Floating Bottom Import Dock */
+  .import-dock {
+    position: fixed;
+    left: 50%;
+    bottom: calc(18px + var(--safe-bottom));
+    transform: translateX(-50%);
+    z-index: 45;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px;
+    border-radius: 999px;
+    background: rgba(11, 27, 43, 0.9);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .dock-btn {
+    height: 42px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+
+  .dock-btn:active {
+    background: rgba(16, 185, 129, 0.2);
+  }
+
+  .dock-btn.pic {
+    color: var(--cyan-bright);
+  }
+
+  .dock-btn.vid {
+    color: var(--emerald-bright);
+  }
+
+  .dock-btn.doc {
+    color: #e2e8f0;
+  }
+
+  .dock-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border-subtle);
+  }
+
+  /* Drop Overlay */
+  #dropOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: rgba(6, 16, 25, 0.88);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .drop-frame {
+    width: calc(100% - 40px);
+    max-width: 420px;
+    height: 220px;
+    border-radius: 24px;
+    border: 2px dashed var(--emerald-bright);
+    background: rgba(16, 185, 129, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--emerald-bright);
+    font-weight: 600;
+  }
+
+  /* Modals */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: rgba(3, 9, 15, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: calc(16px + var(--safe-top)) 16px calc(16px + var(--safe-bottom));
+  }
+
+  .modal-panel {
+    width: 100%;
+    max-width: 560px;
+    max-height: 90dvh;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .preview-stage {
+    width: 100%;
+    min-height: 240px;
+    max-height: 58dvh;
+    border-radius: 16px;
+    background: #040b12;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .preview-stage img,
+  .preview-stage video {
+    max-width: 100%;
+    max-height: 58dvh;
+    object-fit: contain;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-secondary {
+    flex: 1;
+    height: 46px;
+    border-radius: 13px;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-danger {
+    height: 46px;
+    padding: 0 18px;
+    border-radius: 13px;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.14);
+    color: #fca5a5;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Privacy Curtain -->
+<div id="privacyCurtain" class="hidden">
+  <div class="shield-badge">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2L4 5.5V11.5C4 16.8 7.4 21.6 12 23C16.6 21.6 20 16.8 20 11.5V5.5L12 2Z" stroke="#00e699" stroke-width="1.8"/>
+      <rect x="9" y="11" width="6" height="5" rx="1.2" stroke="#38bdf8" stroke-width="1.8"/>
+      <path d="M10 11V9C10 7.9 10.9 7 12 7C13.1 7 14 7.9 14 9V11" stroke="#38bdf8" stroke-width="1.8"/>
+    </svg>
+  </div>
+  <div class="brand-title">KVN_EXE Vault</div>
+</div>
+
+<!-- First-Time Setup Screen -->
+<section id="setupScreen" class="auth-screen hidden">
+  <div class="auth-card">
+    <div class="shield-badge">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L4 5.5V11.5C4 16.8 7.4 21.6 12 23C16.6 21.6 20 16.8 20 11.5V5.5L12 2Z" stroke="#00e699" stroke-width="1.8"/>
+        <path d="M9 12L11 14L15 10" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1 class="brand-title">KVN_EXE Vault</h1>
+    <form id="setupForm" class="form-stack" autocomplete="off">
+      <div class="input-wrap">
+        <input id="setupPass" class="vault-input" type="password" placeholder="Create Password" required minlength="4">
+        <button type="button" class="eye-btn" data-toggle="setupPass" aria-label="Show password">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+      <div class="strength-track"><div id="strengthFill" class="strength-fill"></div></div>
+      <div class="input-wrap">
+        <input id="setupConfirm" class="vault-input" type="password" placeholder="Confirm Password" required minlength="4">
+      </div>
+      <div class="toggle-row">
+        <span>Apple Face ID</span>
+        <label class="switch">
+          <input id="setupFaceIdToggle" type="checkbox" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div id="setupError" class="error-pill hidden"></div>
+      <button type="submit" class="btn-primary">Create Vault</button>
+    </form>
+  </div>
+</section>
+
+<!-- Lock Screen -->
+<section id="lockScreen" class="auth-screen hidden">
+  <div id="lockCard" class="auth-card">
+    <div class="shield-badge">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L4 5.5V11.5C4 16.8 7.4 21.6 12 23C16.6 21.6 20 16.8 20 11.5V5.5L12 2Z" stroke="#00e699" stroke-width="1.8"/>
+        <rect x="9" y="11" width="6" height="5" rx="1.2" stroke="#38bdf8" stroke-width="1.8"/>
+        <path d="M10 11V9C10 7.9 10.9 7 12 7C13.1 7 14 7.9 14 9V11" stroke="#38bdf8" stroke-width="1.8"/>
+      </svg>
+    </div>
+    <h1 class="brand-title">KVN_EXE Vault</h1>
+
+    <button id="faceIdUnlockBtn" type="button" class="btn-faceid hidden">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+        <path d="M7 3H5a2 2 0 0 0-2 2v2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+        <path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M17 21h2a2 2 0 0 0 2-2v-2"/>
+        <path d="M9 9v1"/><path d="M15 9v1"/><path d="M12 9v3h-1"/><path d="M9.5 15.5c1.3 1.2 3.7 1.2 5 0"/>
+      </svg>
+      <span>Face ID</span>
+    </button>
+
+    <form id="unlockForm" class="form-stack" autocomplete="off">
+      <div class="input-wrap">
+        <input id="unlockPass" class="vault-input" type="password" placeholder="Password" required>
+        <button type="button" class="eye-btn" data-toggle="unlockPass" aria-label="Show password">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+      <div id="unlockError" class="error-pill hidden"></div>
+      <button type="submit" class="btn-primary">Unlock</button>
+    </form>
+  </div>
+</section>
+
+<!-- Main Vault App -->
+<main id="vaultApp" class="hidden">
+  <div id="progressWrap" class="hidden"><div id="progressBar"></div></div>
+
+  <header class="top-header">
+    <div class="top-row">
+      <div class="brand-cluster">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L4 5.5V11.5C4 16.8 7.4 21.6 12 23C16.6 21.6 20 16.8 20 11.5V5.5L12 2Z" stroke="#00e699" stroke-width="2"/>
+          <circle cx="12" cy="12" r="2.5" fill="#38bdf8"/>
+        </svg>
+        <span class="brand-name">KVN_EXE Vault</span>
+      </div>
+      <div class="header-actions">
+        <button id="toggleSearchBtn" class="icon-btn" type="button" aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+          </svg>
+        </button>
+        <button id="openSettingsBtn" class="icon-btn" type="button" aria-label="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+        <button id="lockNowBtn" class="icon-btn lock-btn" type="button" aria-label="Lock">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="searchDrawer" class="search-drawer hidden">
+      <input id="searchInput" class="vault-input" type="search" placeholder="Search">
+    </div>
+  </header>
+
+  <div class="sub-bar">
+    <div class="filter-pills" id="filterPills">
+      <button class="pill active" data-filter="all" type="button">All</button>
+      <button class="pill" data-filter="image" type="button">Pictures</button>
+      <button class="pill" data-filter="video" type="button">Videos</button>
+      <button class="pill" data-filter="file" type="button">Files</button>
+    </div>
+    <div class="view-controls">
+      <button id="blurToggleBtn" class="icon-btn" type="button" aria-label="Blur previews">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      </button>
+      <button id="layoutToggleBtn" class="icon-btn" type="button" aria-label="Layout">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="vault-container">
+    <div id="emptyState" class="empty-state hidden">
+      <div class="empty-ring">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 2L4 5.5V11.5C4 16.8 7.4 21.6 12 23C16.6 21.6 20 16.8 20 11.5V5.5L12 2Z"/>
+          <path d="M12 9v6"/><path d="M9 12h6"/>
+        </svg>
+      </div>
+      <span>Empty</span>
+    </div>
+    <div id="vaultGrid" class="vault-grid"></div>
+  </div>
+
+  <!-- Floating Bottom Import Dock -->
+  <nav class="import-dock" aria-label="Import">
+    <button id="importPicBtn" class="dock-btn pic" type="button">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/>
+        <path d="M21 15l-5-5L5 21"/>
+      </svg>
+      <span>Pictures</span>
+    </button>
+    <div class="dock-divider"></div>
+    <button id="importVidBtn" class="dock-btn vid" type="button">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="5" width="15" height="14" rx="2.5"/><path d="M17 10l5-3v10l-5-3z"/>
+      </svg>
+      <span>Videos</span>
+    </button>
+    <div class="dock-divider"></div>
+    <button id="importFileBtn" class="dock-btn doc" type="button">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      <span>Files</span>
+    </button>
+  </nav>
+
+  <input id="picInput" type="file" accept="image/*" multiple class="hidden">
+  <input id="vidInput" type="file" accept="video/*" multiple class="hidden">
+  <input id="fileInput" type="file" accept="*/*" multiple class="hidden">
+</main>
+
+<!-- Drag & Drop Overlay -->
+<div id="dropOverlay" class="hidden">
+  <div class="drop-frame">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+    <span>Drop to Encrypt</span>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div id="previewModal" class="modal-backdrop hidden">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <span id="previewTitle" class="modal-title"></span>
+      <button id="closePreviewBtn" class="icon-btn" type="button" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="previewStage" class="preview-stage"></div>
+      <div class="modal-actions">
+        <button id="shareExportBtn" class="btn-secondary" type="button">Save / Share</button>
+        <button id="downloadExportBtn" class="btn-secondary" type="button">Download</button>
+        <button id="deleteItemBtn" class="btn-danger" type="button">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="modal-backdrop hidden">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <span class="modal-title">Settings</span>
+      <button id="closeSettingsBtn" class="icon-btn" type="button" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="toggle-row">
+        <span>Apple Face ID</span>
+        <label class="switch">
+          <input id="settingsFaceIdToggle" type="checkbox">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <span>Lock on Close / Background</span>
+        <label class="switch">
+          <input id="settingsExitLockToggle" type="checkbox" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <form id="changePassForm" class="form-stack" autocomplete="off">
+        <input id="newPassInput" class="vault-input" type="password" placeholder="New Password" minlength="4" required>
+        <button type="submit" class="btn-secondary">Update Password</button>
+      </form>
+      <div id="settingsStatus" class="error-pill hidden"></div>
+      <button id="wipeVaultBtn" type="button" class="btn-danger">Reset Vault</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const DB_NAME = "KVN_EXE_Vault_DB";
+  const DB_VERSION = 1;
+  const STORE_META = "meta";
+  const STORE_ITEMS = "items";
+
+  let db = null;
+  let masterVaultKey = null; // Non-extractable RAM-only CryptoKey
+  let activeFilter = "all";
+  let searchQuery = "";
+  let blurPreviews = false;
+  let listMode = false;
+  let isPickingFiles = false;
+  let isAuthenticatingFaceID = false;
+  let activeBlobUrls = new Set();
+  let currentPreviewItem = null;
+  let currentPreviewBlob = null;
+  let currentPreviewUrl = null;
+  let wipeArmed = false;
+
+  const $ = (id) => document.getElementById(id);
+
+  // Generate 512x512 PNG Apple Touch Icon & Manifest
+  function setupiOSAppMetadata() {
+    try {
+      const c = document.createElement("canvas");
+      c.width = 512;
+      c.height = 512;
+      const ctx = c.getContext("2d");
+      const bg = ctx.createLinearGradient(0, 0, 512, 512);
+      bg.addColorStop(0, "#061019");
+      bg.addColorStop(1, "#0f2942");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, 512, 512);
+
+      const shield = ctx.createLinearGradient(120, 90, 392, 420);
+      shield.addColorStop(0, "#0ea5e9");
+      shield.addColorStop(1, "#00e699");
+      ctx.strokeStyle = shield;
+      ctx.lineWidth = 22;
+      ctx.beginPath();
+      ctx.moveTo(256, 86);
+      ctx.lineTo(392, 144);
+      ctx.lineTo(392, 252);
+      ctx.bezierCurveTo(392, 344, 334, 412, 256, 434);
+      ctx.bezierCurveTo(178, 412, 120, 344, 120, 252);
+      ctx.lineTo(120, 144);
+      ctx.closePath();
+      ctx.stroke();
+
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 18;
+      ctx.strokeRect(206, 246, 100, 82);
+      ctx.beginPath();
+      ctx.arc(256, 246, 32, Math.PI, 0);
+      ctx.stroke();
+
+      const pngUrl = c.toDataURL("image/png");
+      const link = document.createElement("link");
+      link.rel = "apple-touch-icon";
+      link.href = pngUrl;
+      document.head.appendChild(link);
+
+      const manifest = {
+        name: "KVN_EXE Vault",
+        short_name: "KVN_EXE Vault",
+        start_url: ".",
+        display: "standalone",
+        background_color: "#061019",
+        theme_color: "#061019",
+        icons: [{ src: pngUrl, sizes: "512x512", type: "image/png" }]
+      };
+      const mBlob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
+      const mLink = document.createElement("link");
+      mLink.rel = "manifest";
+      mLink.href = URL.createObjectURL(mBlob);
+      document.head.appendChild(mLink);
+    } catch (_) {}
+  }
+
+  // IndexedDB Helpers
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const database = e.target.result;
+        if (!database.objectStoreNames.contains(STORE_META)) {
+          database.createObjectStore(STORE_META, { keyPath: "key" });
+        }
+        if (!database.objectStoreNames.contains(STORE_ITEMS)) {
+          database.createObjectStore(STORE_ITEMS, { keyPath: "id" });
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function dbGet(store, key) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, "readonly");
+      const req = tx.objectStore(store).get(key);
+      req.onsuccess = () => resolve(req.result ? req.result.value : null);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function dbPut(store, key, value) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, "readwrite");
+      const req = store === STORE_META
+        ? tx.objectStore(store).put({ key, value })
+        : tx.objectStore(store).put(value);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function dbGetAllItems() {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_ITEMS, "readonly");
+      const req = tx.objectStore(STORE_ITEMS).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function dbDeleteItem(id) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_ITEMS, "readwrite");
+      const req = tx.objectStore(STORE_ITEMS).delete(id);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  // Cryptography Engine (PBKDF2 + AES-GCM 256-bit)
+  async function derivePasswordKey(password, salt) {
+    const enc = new TextEncoder();
+    const baseKey = await crypto.subtle.importKey(
+      "raw",
+      enc.encode(password),
+      "PBKDF2",
+      false,
+      ["deriveKey"]
+    );
+    return crypto.subtle.deriveKey(
+      { name: "PBKDF2", salt, iterations: 150000, hash: "SHA-256" },
+      baseKey,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["wrapKey", "unwrapKey"]
+    );
+  }
+
+  async function wrapMVK(mvk, wrappingKey) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const wrapped = await crypto.subtle.wrapKey("raw", mvk, wrappingKey, { name: "AES-GCM", iv });
+    return { iv: Array.from(iv), data: Array.from(new Uint8Array(wrapped)) };
+  }
+
+  async function unwrapMVK(slot, wrappingKey) {
+    const iv = new Uint8Array(slot.iv);
+    const data = new Uint8Array(slot.data);
+    return crypto.subtle.unwrapKey(
+      "raw",
+      data,
+      wrappingKey,
+      { name: "AES-GCM", iv },
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["encrypt", "decrypt"]
+    );
+  }
+
+  async function encryptBytes(buffer, key) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const cipher = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, buffer);
+    return { iv, cipher };
+  }
+
+  async function decryptBytes(cipherBuffer, ivArray, key) {
+    return crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: new Uint8Array(ivArray) },
+      key,
+      cipherBuffer
+    );
+  }
+
+  // Apple Face ID Bridge (Native WKWebView LAContext + Safari WebAuthn)
+  function hasNativeWKFaceID() {
+    return Boolean(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.kvnFaceID);
+  }
+
+  function promptNativeWKFaceID() {
+    return new Promise((resolve) => {
+      isAuthenticatingFaceID = true;
+      window.__kvnFaceIDResolve = (success) => {
+        isAuthenticatingFaceID = false;
+        window.__kvnFaceIDResolve = null;
+        resolve(Boolean(success));
+      };
+      try {
+        window.webkit.messageHandlers.kvnFaceID.postMessage("authenticate");
+      } catch (_) {
+        isAuthenticatingFaceID = false;
+        resolve(false);
+      }
+    });
+  }
+
+  async function registerFaceIDSlot(mvk) {
+    isAuthenticatingFaceID = true;
+    try {
+      let verified = false;
+      let credId = null;
+
+      if (hasNativeWKFaceID()) {
+        verified = await promptNativeWKFaceID();
+      } else if (window.PublicKeyCredential && window.isSecureContext) {
+        const challenge = crypto.getRandomValues(new Uint8Array(32));
+        const userId = crypto.getRandomValues(new Uint8Array(16));
+        const cred = await navigator.credentials.create({
+          publicKey: {
+            challenge,
+            rp: { name: "KVN_EXE Vault" },
+            user: { id: userId, name: "owner", displayName: "Owner" },
+            pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
+            authenticatorSelection: {
+              authenticatorAttachment: "platform",
+              userVerification: "required"
+            },
+            timeout: 60000
+          }
+        });
+        if (cred) {
+          verified = true;
+          credId = Array.from(new Uint8Array(cred.rawId));
+        }
+      }
+
+      if (!verified) return false;
+
+      const bioKey = await crypto.subtle.generateKey(
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["wrapKey", "unwrapKey"]
+      );
+      const wrappedSlot = await wrapMVK(mvk, bioKey);
+      await dbPut(STORE_META, "faceIdConfig", {
+        enabled: true,
+        credId,
+        bioKey,
+        wrappedSlot
+      });
+      return true;
+    } catch (_) {
+      return false;
+    } finally {
+      isAuthenticatingFaceID = false;
+    }
+  }
+
+  async function unlockWithFaceID() {
+    const cfg = await dbGet(STORE_META, "faceIdConfig");
+    if (!cfg || !cfg.enabled || !cfg.bioKey || !cfg.wrappedSlot) return false;
+
+    isAuthenticatingFaceID = true;
+    try {
+      let verified = false;
+      if (hasNativeWKFaceID()) {
+        verified = await promptNativeWKFaceID();
+      } else if (window.PublicKeyCredential && window.isSecureContext && cfg.credId) {
+        const challenge = crypto.getRandomValues(new Uint8Array(32));
+        const assertion = await navigator.credentials.get({
+          publicKey: {
+            challenge,
+            allowCredentials: [{ type: "public-key", id: new Uint8Array(cfg.credId) }],
+            userVerification: "required",
+            timeout: 60000
+          }
+        });
+        verified = Boolean(assertion);
+      }
+      if (!verified) return false;
+
+      masterVaultKey = await unwrapMVK(cfg.wrappedSlot, cfg.bioKey);
+      return true;
+    } catch (_) {
+      return false;
+    } finally {
+      isAuthenticatingFaceID = false;
+    }
+  }
+
+  // Thumbnail Generator
+  async function generateEncryptedThumbnail(file, category) {
+    if (category !== "image" && category !== "video") return null;
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(file);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const finish = async (source, w, h) => {
+        try {
+          const maxDim = 360;
+          const scale = Math.min(1, maxDim / Math.max(w, h));
+          canvas.width = Math.max(1, Math.round(w * scale));
+          canvas.height = Math.max(1, Math.round(h * scale));
+          ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(async (blob) => {
+            URL.revokeObjectURL(url);
+            if (!blob) return resolve(null);
+            const buf = await blob.arrayBuffer();
+            const enc = await encryptBytes(buf, masterVaultKey);
+            resolve({ iv: Array.from(enc.iv), cipher: enc.cipher });
+          }, "image/jpeg", 0.78);
+        } catch (_) {
+          URL.revokeObjectURL(url);
+          resolve(null);
+        }
+      };
+
+      if (category === "image") {
+        const img = new Image();
+        img.onload = () => finish(img, img.naturalWidth, img.naturalHeight);
+        img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+        img.src = url;
+      } else {
+        const video = document.createElement("video");
+        video.preload = "metadata";
+        video.muted = true;
+        video.playsInline = true;
+        video.onloadeddata = () => {
+          video.currentTime = Math.min(0.8, (video.duration || 1) * 0.25);
+        };
+        video.onseeked = () => finish(video, video.videoWidth || 320, video.videoHeight || 240);
+        video.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+        video.src = url;
+      }
+    });
+  }
+
+  // Lock & Memory Purge
+  function revokeAllBlobs() {
+    activeBlobUrls.forEach((u) => URL.revokeObjectURL(u));
+    activeBlobUrls.clear();
+    if (currentPreviewUrl) {
+      URL.revokeObjectURL(currentPreviewUrl);
+      currentPreviewUrl = null;
+    }
+    currentPreviewBlob = null;
+    currentPreviewItem = null;
+  }
+
+  async function lockVault() {
+    masterVaultKey = null;
+    revokeAllBlobs();
+    $("vaultGrid").innerHTML = "";
+    $("previewStage").innerHTML = "";
+    $("previewModal").classList.add("hidden");
+    $("settingsModal").classList.add("hidden");
+    $("unlockPass").value = "";
+    $("unlockError").classList.add("hidden");
+    $("vaultApp").classList.add("hidden");
+    $("setupScreen").classList.add("hidden");
+    $("lockScreen").classList.remove("hidden");
+
+    const cfg = await dbGet(STORE_META, "faceIdConfig");
+    $("faceIdUnlockBtn").classList.toggle("hidden", !(cfg && cfg.enabled));
+  }
+
+  async function enterVault() {
+    $("privacyCurtain").classList.add("hidden");
+    $("setupScreen").classList.add("hidden");
+    $("lockScreen").classList.add("hidden");
+    $("vaultApp").classList.remove("hidden");
+    await renderVaultItems();
+  }
+
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
+    if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + " MB";
+    return (bytes / 1073741824).toFixed(2) + " GB";
+  }
+
+  function classifyFile(file) {
+    if (file.type.startsWith("image/")) return "image";
+    if (file.type.startsWith("video/")) return "video";
+    return "file";
+  }
+
+  // Import & Encrypt Files
+  async function handleFilesImport(fileList) {
+    if (!masterVaultKey || !fileList || fileList.length === 0) return;
+    const files = Array.from(fileList);
+    $("progressWrap").classList.remove("hidden");
+    $("progressBar").style.width = "8%";
+
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
+      const category = classifyFile(f);
+      const rawBuf = await f.arrayBuffer();
+      const enc = await encryptBytes(rawBuf, masterVaultKey);
+      const thumb = await generateEncryptedThumbnail(f, category);
+
+      const record = {
+        id: crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2),
+        name: f.name,
+        mime: f.type || "application/octet-stream",
+        size: f.size,
+        category,
+        createdAt: Date.now(),
+        iv: Array.from(enc.iv),
+        cipher: enc.cipher,
+        thumb
+      };
+      await dbPut(STORE_ITEMS, record.id, record);
+      $("progressBar").style.width = Math.round(((i + 1) / files.length) * 100) + "%";
+    }
+
+    setTimeout(() => {
+      $("progressWrap").classList.add("hidden");
+      $("progressBar").style.width = "0%";
+    }, 250);
+
+    await renderVaultItems();
+  }
+
+  // Render Grid
+  async function renderVaultItems() {
+    if (!masterVaultKey) return;
+    revokeAllBlobs();
+    const grid = $("vaultGrid");
+    grid.innerHTML = "";
+    grid.classList.toggle("blurred", blurPreviews);
+    grid.classList.toggle("list-mode", listMode);
+
+    let items = await dbGetAllItems();
+    items.sort((a, b) => b.createdAt - a.createdAt);
+
+    if (activeFilter !== "all") {
+      items = items.filter((it) => it.category === activeFilter);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      items = items.filter((it) => it.name.toLowerCase().includes(q));
+    }
+
+    $("emptyState").classList.toggle("hidden", items.length > 0);
+
+    for (const item of items) {
+      const card = document.createElement("div");
+      card.className = "media-card";
+
+      const thumbBox = document.createElement("div");
+      thumbBox.className = "thumb-box";
+
+      if (item.thumb && item.thumb.cipher) {
+        try {
+          const decThumb = await decryptBytes(item.thumb.cipher, item.thumb.iv, masterVaultKey);
+          const blob = new Blob([decThumb], { type: "image/jpeg" });
+          const url = URL.createObjectURL(blob);
+          activeBlobUrls.add(url);
+          const img = document.createElement("img");
+          img.src = url;
+          img.alt = "";
+          thumbBox.appendChild(img);
+        } catch (_) {}
+      } else {
+        const ext = (item.name.split(".").pop() || "FILE").slice(0, 5);
+        const badge = document.createElement("span");
+        badge.className = "file-ext-badge";
+        badge.textContent = ext;
+        thumbBox.appendChild(badge);
+      }
+
+      if (item.category === "video") {
+        const play = document.createElement("div");
+        play.className = "play-badge";
+        play.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>';
+        thumbBox.appendChild(play);
+      }
+
+      const meta = document.createElement("div");
+      meta.className = "card-meta";
+      const title = document.createElement("div");
+      title.className = "card-title";
+      title.textContent = item.name;
+      const size = document.createElement("div");
+      size.className = "card-size";
+      size.textContent = formatBytes(item.size);
+      meta.append(title, size);
+
+      card.append(thumbBox, meta);
+      card.addEventListener("click", () => openItemPreview(item));
+      grid.appendChild(card);
+    }
+  }
+
+  // Preview Modal
+  async function openItemPreview(item) {
+    if (!masterVaultKey) return;
+    const decBuf = await decryptBytes(item.cipher, item.iv, masterVaultKey);
+    const blob = new Blob([decBuf], { type: item.mime });
+    if (currentPreviewUrl) URL.revokeObjectURL(currentPreviewUrl);
+    currentPreviewBlob = blob;
+    currentPreviewUrl = URL.createObjectURL(blob);
+    currentPreviewItem = item;
+
+    $("previewTitle").textContent = item.name;
+    const stage = $("previewStage");
+    stage.innerHTML = "";
+
+    if (item.category === "image") {
+      const img = document.createElement("img");
+      img.src = currentPreviewUrl;
+      stage.appendChild(img);
+    } else if (item.category === "video") {
+      const vid = document.createElement("video");
+      vid.src = currentPreviewUrl;
+      vid.controls = true;
+      vid.playsInline = true;
+      vid.autoplay = true;
+      stage.appendChild(vid);
+    } else {
+      const box = document.createElement("div");
+      box.style.padding = "24px";
+      box.style.textAlign = "center";
+      box.innerHTML = `<div class="file-ext-badge" style="display:inline-block;margin-bottom:10px;">${formatBytes(item.size)}</div><div style="color:#94a3b8;font-size:13px;">${item.mime}</div>`;
+      stage.appendChild(box);
+    }
+
+    $("previewModal").classList.remove("hidden");
+  }
+
+  function closePreviewModal() {
+    $("previewModal").classList.add("hidden");
+    $("previewStage").innerHTML = "";
+    if (currentPreviewUrl) {
+      URL.revokeObjectURL(currentPreviewUrl);
+      currentPreviewUrl = null;
+    }
+    currentPreviewBlob = null;
+    currentPreviewItem = null;
+  }
+
+  // Event Bindings
+  function bindEvents() {
+    document.querySelectorAll("[data-toggle]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const inp = $(btn.dataset.toggle);
+        inp.type = inp.type === "password" ? "text" : "password";
+      });
+    });
+
+    $("setupPass").addEventListener("input", (e) => {
+      const len = e.target.value.length;
+      const pct = Math.min(100, Math.round((len / 12) * 100));
+      $("strengthFill").style.width = pct + "%";
+    });
+
+    $("setupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const p1 = $("setupPass").value;
+      const p2 = $("setupConfirm").value;
+      const err = $("setupError");
+      if (p1 !== p2) {
+        err.textContent = "Passwords do not match";
+        err.classList.remove("hidden");
+        return;
+      }
+      err.classList.add("hidden");
+
+      const mvk = await crypto.subtle.generateKey(
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["encrypt", "decrypt"]
+      );
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const pwKey = await derivePasswordKey(p1, salt);
+      const passwordSlot = await wrapMVK(mvk, pwKey);
+
+      await dbPut(STORE_META, "vaultConfig", {
+        initialized: true,
+        salt: Array.from(salt),
+        passwordSlot,
+        exitLock: true
+      });
+
+      if ($("setupFaceIdToggle").checked) {
+        await registerFaceIDSlot(mvk);
+      }
+
+      // Re-import MVK as non-extractable in memory
+      const rawMvk = await crypto.subtle.exportKey("raw", mvk);
+      masterVaultKey = await crypto.subtle.importKey(
+        "raw",
+        rawMvk,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+
+      $("setupPass").value = "";
+      $("setupConfirm").value = "";
+      await enterVault();
+    });
+
+    $("unlockForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const pass = $("unlockPass").value;
+      const vCfg = await dbGet(STORE_META, "vaultConfig");
+      try {
+        const pwKey = await derivePasswordKey(pass, new Uint8Array(vCfg.salt));
+        masterVaultKey = await unwrapMVK(vCfg.passwordSlot, pwKey);
+        $("unlockPass").value = "";
+        $("unlockError").classList.add("hidden");
+        await enterVault();
+      } catch (_) {
+        $("unlockError").textContent = "Wrong password";
+        $("unlockError").classList.remove("hidden");
+        const card = $("lockCard");
+        card.classList.remove("shake");
+        void card.offsetWidth;
+        card.classList.add("shake");
+      }
+    });
+
+    $("faceIdUnlockBtn").addEventListener("click", async () => {
+      const ok = await unlockWithFaceID();
+      if (ok) {
+        await enterVault();
+      } else {
+        $("unlockError").textContent = "Face ID failed";
+        $("unlockError").classList.remove("hidden");
+      }
+    });
+
+    $("lockNowBtn").addEventListener("click", lockVault);
+
+    $("toggleSearchBtn").addEventListener("click", () => {
+      const d = $("searchDrawer");
+      d.classList.toggle("hidden");
+      if (!d.classList.contains("hidden")) $("searchInput").focus();
+      else {
+        $("searchInput").value = "";
+        searchQuery = "";
+        renderVaultItems();
+      }
+    });
+
+    $("searchInput").addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      renderVaultItems();
+    });
+
+    $("filterPills").addEventListener("click", (e) => {
+      const pill = e.target.closest(".pill");
+      if (!pill) return;
+      document.querySelectorAll(".pill").forEach((p) => p.classList.remove("active"));
+      pill.classList.add("active");
+      activeFilter = pill.dataset.filter;
+      renderVaultItems();
+    });
+
+    $("blurToggleBtn").addEventListener("click", () => {
+      blurPreviews = !blurPreviews;
+      $("blurToggleBtn").classList.toggle("active", blurPreviews);
+      $("vaultGrid").classList.toggle("blurred", blurPreviews);
+    });
+
+    $("layoutToggleBtn").addEventListener("click", () => {
+      listMode = !listMode;
+      $("layoutToggleBtn").classList.toggle("active", listMode);
+      $("vaultGrid").classList.toggle("list-mode", listMode);
+    });
+
+    // Import Triggers
+    const openPicker = (inputEl) => {
+      isPickingFiles = true;
+      inputEl.value = "";
+      inputEl.click();
+      setTimeout(() => { isPickingFiles = false; }, 1500);
+    };
+
+    $("importPicBtn").addEventListener("click", () => openPicker($("picInput")));
+    $("importVidBtn").addEventListener("click", () => openPicker($("vidInput")));
+    $("importFileBtn").addEventListener("click", () => openPicker($("fileInput")));
+
+    ["picInput", "vidInput", "fileInput"].forEach((id) => {
+      $(id).addEventListener("change", async (e) => {
+        isPickingFiles = false;
+        await handleFilesImport(e.target.files);
+      });
+    });
+
+    // Drag & Drop
+    let dragCounter = 0;
+    window.addEventListener("dragenter", (e) => {
+      if (!masterVaultKey) return;
+      e.preventDefault();
+      dragCounter++;
+      $("dropOverlay").classList.remove("hidden");
+    });
+    window.addEventListener("dragleave", (e) => {
+      if (!masterVaultKey) return;
+      dragCounter--;
+      if (dragCounter <= 0) {
+        dragCounter = 0;
+        $("dropOverlay").classList.add("hidden");
+      }
+    });
+    window.addEventListener("dragover", (e) => e.preventDefault());
+    window.addEventListener("drop", async (e) => {
+      e.preventDefault();
+      dragCounter = 0;
+      $("dropOverlay").classList.add("hidden");
+      if (masterVaultKey && e.dataTransfer.files.length) {
+        await handleFilesImport(e.dataTransfer.files);
+      }
+    });
+
+    // Preview Modal Controls
+    $("closePreviewBtn").addEventListener("click", closePreviewModal);
+    $("downloadExportBtn").addEventListener("click", () => {
+      if (!currentPreviewUrl || !currentPreviewItem) return;
+      const a = document.createElement("a");
+      a.href = currentPreviewUrl;
+      a.download = currentPreviewItem.name;
+      a.click();
+    });
+
+    $("shareExportBtn").addEventListener("click", async () => {
+      if (!currentPreviewBlob || !currentPreviewItem) return;
+      const file = new File([currentPreviewBlob], currentPreviewItem.name, { type: currentPreviewItem.mime });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file] });
+          return;
+        } catch (_) {}
+      }
+      $("downloadExportBtn").click();
+    });
+
+    $("deleteItemBtn").addEventListener("click", async () => {
+      if (!currentPreviewItem) return;
+      await dbDeleteItem(currentPreviewItem.id);
+      closePreviewModal();
+      await renderVaultItems();
+    });
+
+    // Settings Modal
+    $("openSettingsBtn").addEventListener("click", async () => {
+      const fCfg = await dbGet(STORE_META, "faceIdConfig");
+      const vCfg = await dbGet(STORE_META, "vaultConfig");
+      $("settingsFaceIdToggle").checked = Boolean(fCfg && fCfg.enabled);
+      $("settingsExitLockToggle").checked = vCfg ? vCfg.exitLock !== false : true;
+      $("settingsStatus").classList.add("hidden");
+      wipeArmed = false;
+      $("wipeVaultBtn").textContent = "Reset Vault";
+      $("settingsModal").classList.remove("hidden");
+    });
+
+    $("closeSettingsBtn").addEventListener("click", () => {
+      $("settingsModal").classList.add("hidden");
+    });
+
+    $("settingsFaceIdToggle").addEventListener("change", async (e) => {
+      if (e.target.checked) {
+        // Export temporarily via password prompt or re-generate
+        const vCfg = await dbGet(STORE_META, "vaultConfig");
+        const pw = prompt("Enter current password to enable Face ID");
+        if (!pw) {
+          e.target.checked = false;
+          return;
+        }
+        try {
+          const pwKey = await derivePasswordKey(pw, new Uint8Array(vCfg.salt));
+          const extractableMvk = await crypto.subtle.unwrapKey(
+            "raw",
+            new Uint8Array(vCfg.passwordSlot.data),
+            pwKey,
+            { name: "AES-GCM", iv: new Uint8Array(vCfg.passwordSlot.iv) },
+            { name: "AES-GCM", length: 256 },
+            true,
+            ["encrypt", "decrypt"]
+          );
+          const ok = await registerFaceIDSlot(extractableMvk);
+          e.target.checked = ok;
+        } catch (_) {
+          e.target.checked = false;
+        }
+      } else {
+        await dbPut(STORE_META, "faceIdConfig", { enabled: false });
+      }
+    });
+
+    $("settingsExitLockToggle").addEventListener("change", async (e) => {
+      const vCfg = await dbGet(STORE_META, "vaultConfig");
+      vCfg.exitLock = e.target.checked;
+      await dbPut(STORE_META, "vaultConfig", vCfg);
+    });
+
+    $("changePassForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const newPw = $("newPassInput").value;
+      const curPw = prompt("Enter current password");
+      if (!curPw) return;
+      const vCfg = await dbGet(STORE_META, "vaultConfig");
+      try {
+        const oldKey = await derivePasswordKey(curPw, new Uint8Array(vCfg.salt));
+        const extractableMvk = await crypto.subtle.unwrapKey(
+          "raw",
+          new Uint8Array(vCfg.passwordSlot.data),
+          oldKey,
+          { name: "AES-GCM", iv: new Uint8Array(vCfg.passwordSlot.iv) },
+          { name: "AES-GCM", length: 256 },
+          true,
+          ["encrypt", "decrypt"]
+        );
+        const newSalt = crypto.getRandomValues(new Uint8Array(16));
+        const newKey = await derivePasswordKey(newPw, newSalt);
+        vCfg.salt = Array.from(newSalt);
+        vCfg.passwordSlot = await wrapMVK(extractableMvk, newKey);
+        await dbPut(STORE_META, "vaultConfig", vCfg);
+        $("newPassInput").value = "";
+        $("settingsStatus").textContent = "Password updated";
+        $("settingsStatus").classList.remove("hidden");
+      } catch (_) {
+        $("settingsStatus").textContent = "Wrong current password";
+        $("settingsStatus").classList.remove("hidden");
+      }
+    });
+
+    $("wipeVaultBtn").addEventListener("click", async () => {
+      if (!wipeArmed) {
+        wipeArmed = true;
+        $("wipeVaultBtn").textContent = "Tap Again to Confirm Reset";
+        return;
+      }
+      revokeAllBlobs();
+      masterVaultKey = null;
+      db.close();
+      indexedDB.deleteDatabase(DB_NAME);
+      location.reload();
+    });
+
+    // Strict Auto-Lock on Close / Background / Switch
+    const handleBackgroundExit = async () => {
+      if (isPickingFiles || isAuthenticatingFaceID) return;
+      const vCfg = db ? await dbGet(STORE_META, "vaultConfig") : null;
+      if (vCfg && vCfg.exitLock === false) return;
+      if (masterVaultKey) {
+        await lockVault();
+      }
+    };
+
+    window.addEventListener("blur", () => {
+      if (isPickingFiles || isAuthenticatingFaceID) return;
+      if (masterVaultKey) $("privacyCurtain").classList.remove("hidden");
+    });
+
+    window.addEventListener("focus", () => {
+      $("privacyCurtain").classList.add("hidden");
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        if (!isPickingFiles && !isAuthenticatingFaceID && masterVaultKey) {
+          $("privacyCurtain").classList.remove("hidden");
+        }
+        handleBackgroundExit();
+      } else {
+        $("privacyCurtain").classList.add("hidden");
+      }
+    });
+
+    window.addEventListener("pagehide", handleBackgroundExit);
+    window.addEventListener("beforeunload", handleBackgroundExit);
+  }
+
+  // Boot
+  async function init() {
+    setupiOSAppMetadata();
+    db = await openDB();
+    bindEvents();
+
+    const vCfg = await dbGet(STORE_META, "vaultConfig");
+    if (!vCfg || !vCfg.initialized) {
+      $("setupScreen").classList.remove("hidden");
+      return;
+    }
+
+    await lockVault();
+
+    const fCfg = await dbGet(STORE_META, "faceIdConfig");
+    if (fCfg && fCfg.enabled) {
+      setTimeout(async () => {
+        const ok = await unlockWithFaceID();
+        if (ok) await enterVault();
+      }, 220);
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

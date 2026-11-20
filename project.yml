@@ -1,0 +1,20 @@
+name: KVN_EXE_Vault
+options:
+  bundleIdPrefix: com.kvnexe
+  deploymentTarget:
+    iOS: "15.0"
+targets:
+  KVN_EXE_Vault:
+    type: application
+    platform: iOS
+    sources:
+      - AppDelegate.swift
+      - ViewController.swift
+      - index.html
+    info:
+      path: Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kvnexe.vault
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
